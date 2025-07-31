@@ -7,7 +7,36 @@ import express from "express";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+// Allow CORS for both local and deployed frontend
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://your-frontend-url.vercel.app", // Update this later
+  /\.vercel\.app$/, // Allow all Vercel subdomains
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (mobile apps, etc.)
+      if (!origin) return callback(null, true);
+
+      if (
+        allowedOrigins.some((allowed) =>
+          typeof allowed === "string"
+            ? allowed === origin
+            : allowed.test(origin)
+        )
+      ) {
+        return callback(null, true);
+      }
+
+      callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
+
 app.use(bodyParser.json());
 
 app.post("/ask", async (req, res) => {
@@ -37,8 +66,8 @@ app.post("/ask", async (req, res) => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          "HTTP-Referer": "http://localhost:3000", // required by OpenRouter
-          "X-Title": "My AI App", // optional
+          "HTTP-Referer": process.env.FRONTEND_URL || "http://localhost:3000",
+          "X-Title": "My AI App",
         },
       }
     );
