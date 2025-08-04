@@ -3,15 +3,19 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import connectDB from "./config/db.js";
+import UserDataRoutes from "./route/UserDataRoutes.js";
+import chatPostRoute from "./route/chat/chatPostRoute.js";
 
 dotenv.config();
 
 const app = express();
+connectDB();
 
 // Allow CORS for both local and deployed frontend
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://your-frontend-url.vercel.app", // Update this later
+  "https://ai-query-frontend.vercel.app", // Your deployed frontend
   /\.vercel\.app$/, // Allow all Vercel subdomains
 ];
 
@@ -34,8 +38,12 @@ app.use(
       callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
-  })
+  }),
+  express.json()
 );
+
+app.use("/api", UserDataRoutes);
+app.use("/api/", chatPostRoute);
 
 app.use(bodyParser.json());
 
