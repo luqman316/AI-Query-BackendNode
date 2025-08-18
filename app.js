@@ -4,8 +4,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import connectDB from "./config/db.js";
+import ChatDataRoutes from "./route/ChatDataRoutes.js";
 import UserDataRoutes from "./route/UserDataRoutes.js";
-import chatPostRoute from "./route/chat/chatPostRoute.js";
+// import chatRoutes from "./route/chatRoutes.js";
 
 dotenv.config();
 
@@ -43,7 +44,8 @@ app.use(
 );
 
 app.use("/api", UserDataRoutes);
-app.use("/api/", chatPostRoute);
+app.use("/api", ChatDataRoutes);
+// app.use("/api/", chatPostRoute);
 
 app.use(bodyParser.json());
 
